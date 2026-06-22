@@ -27,8 +27,9 @@ Deploys a Docker Compose application with minimal per-app Ansible code.
 | `docker_application_user` | `docker_application_name` | Owner of writable application directories on the host. |
 | `docker_application_group` | `docker_application_user` | Group of writable application directories on the host. |
 | `docker_application_compose_dir` | `/opt/{{ docker_application_name }}` | Docker Compose project directory. |
-| `docker_application_compose_file` | `<compose_dir>/docker-compose.yml` | Destination path for the rendered Compose file. |
-| `docker_application_dotenv_file` | `<compose_dir>/.env` | Destination path for the rendered dotenv file. |
+| `docker_application_compose_file` | `<compose_dir>/docker-compose.yml` | Destination path for the rendered Compose file. The file name is also passed to Docker Compose. |
+| `docker_application_dotenv_file` | `<compose_dir>/.env` | Destination path for the rendered dotenv file. The file name is also passed to Docker Compose when dotenv deployment is enabled and the template exists. |
+| `docker_application_dotenv_mode` | `0600` | File mode for the rendered dotenv file. Override this when host-local users must read the file directly. |
 | `docker_application_config_dir` | `<compose_dir>/config` | Default writable config directory created by the role. |
 | `docker_application_storage_dirs` | `[]` | Additional writable directories to create (storage mounts, subdirectories, etc.). |
 | `docker_application_compose_template` | `<playbook_dir>/templates/docker-compose.yml.j2` | Path to the Compose template on the controller. |
@@ -86,4 +87,6 @@ Deploys a Docker Compose application with minimal per-app Ansible code.
 
 - The role deliberately supports playbook-local `templates/` and optional `tasks/pre.yml` and `tasks/post.yml`, so simple apps do not need a dedicated role.
 - `templates/dotenv.j2` is optional; if it exists and `docker_application_deploy_dotenv` is `true`, the role renders it to `.env` in the Compose directory.
+- Custom compose and dotenv file names are supported when the files live directly in `docker_application_compose_dir`, for example `docker-compose.staging.yml` or `.env.staging`.
+- Extra files rendered through `docker_application_template_files` notify the restart handler, because Docker Compose does not reliably recreate containers when bind-mounted config files change.
 - Custom handlers are not loaded from the playbook directory. If you need app-specific handler behavior, either notify the generic handlers from pre/post tasks or create a dedicated application role.

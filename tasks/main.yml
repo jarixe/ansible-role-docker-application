@@ -32,6 +32,19 @@
     - "{{ docker_application_post_tasks_file }}"
   register: docker_application_optional_stats
 
+- name: Set docker compose file arguments
+  ansible.builtin.set_fact:
+    docker_application_compose_files:
+      - "{{ docker_application_compose_file | basename }}"
+
+- name: Set docker compose dotenv arguments
+  ansible.builtin.set_fact:
+    docker_application_env_files:
+      - "{{ docker_application_dotenv_file | basename }}"
+  when:
+    - docker_application_deploy_dotenv | bool
+    - docker_application_optional_stats.results[1].stat.exists
+
 - name: Include docker application pre-tasks
   ansible.builtin.include_tasks: "{{ docker_application_pre_tasks_file }}"
   when: docker_application_optional_stats.results[0].stat.exists
@@ -67,7 +80,7 @@
     dest: "{{ docker_application_dotenv_file }}"
     owner: root
     group: root
-    mode: "0644"
+    mode: "{{ docker_application_dotenv_mode }}"
   when:
     - docker_application_deploy_dotenv | bool
     - docker_application_optional_stats.results[1].stat.exists
@@ -80,10 +93,13 @@
     group: "{{ item.group | default(docker_application_group) }}"
     mode: "{{ item.mode | default('0644') }}"
   loop: "{{ docker_application_template_files }}"
+  notify: Restart docker application
 
 - name: Ensure docker application is running
   community.docker.docker_compose_v2:
     project_src: "{{ docker_application_compose_dir }}"
+    files: "{{ docker_application_compose_files }}"
+    env_files: "{{ docker_application_env_files | default(omit) }}"
     state: present
     pull: "{{ docker_application_pull_policy }}"
     remove_orphans: "{{ docker_application_remove_orphans }}"
