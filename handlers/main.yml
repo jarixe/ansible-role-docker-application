@@ -1,0 +1,19 @@
+---
+- name: Reconcile docker application compose
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_application_compose_dir }}"
+    state: present
+    pull: "{{ docker_application_pull_policy }}"
+    remove_orphans: "{{ docker_application_remove_orphans }}"
+
+- name: Restart docker application
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_application_compose_dir }}"
+    state: restarted
+
+- name: Prune dangling Docker images
+  community.docker.docker_prune:
+    images: true
+    images_filters:
+      dangling: true
+  when: docker_application_prune_dangling_images | bool

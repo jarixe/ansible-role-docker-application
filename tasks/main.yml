@@ -1,0 +1,100 @@
+---
+- name: Validate docker application role variables
+  ansible.builtin.assert:
+    that:
+      - docker_application_name | length > 0
+      - docker_application_user | length > 0
+      - docker_application_group | length > 0
+      - docker_application_compose_dir | length > 0
+      - docker_application_compose_template | length > 0
+    fail_msg: "Set docker_application_name, user/group, compose_dir, and compose_template before using ansible-role-docker-application."
+
+- name: Check docker compose template exists on the controller
+  ansible.builtin.stat:
+    path: "{{ docker_application_compose_template }}"
+  delegate_to: localhost
+  become: false
+  register: docker_application_compose_template_stat
+
+- name: Fail when docker compose template is missing
+  ansible.builtin.fail:
+    msg: "Docker compose template not found: {{ docker_application_compose_template }}"
+  when: not docker_application_compose_template_stat.stat.exists
+
+- name: Check for optional docker application task and template files
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  delegate_to: localhost
+  become: false
+  loop:
+    - "{{ docker_application_pre_tasks_file }}"
+    - "{{ docker_application_dotenv_template }}"
+    - "{{ docker_application_post_tasks_file }}"
+  register: docker_application_optional_stats
+
+- name: Include docker application pre-tasks
+  ansible.builtin.include_tasks: "{{ docker_application_pre_tasks_file }}"
+  when: docker_application_optional_stats.results[0].stat.exists
+
+- name: Create docker compose project directory
+  ansible.builtin.file:
+    path: "{{ docker_application_compose_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create docker application directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ docker_application_user }}"
+    group: "{{ docker_application_group }}"
+    mode: "0755"
+  loop: "{{ ([docker_application_config_dir] + docker_application_storage_dirs) | select('truthy') | list | unique }}"
+
+- name: Deploy docker compose configuration
+  ansible.builtin.template:
+    src: "{{ docker_application_compose_template }}"
+    dest: "{{ docker_application_compose_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Deploy docker application dotenv file
+  ansible.builtin.template:
+    src: "{{ docker_application_dotenv_template }}"
+    dest: "{{ docker_application_dotenv_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when:
+    - docker_application_deploy_dotenv | bool
+    - docker_application_optional_stats.results[1].stat.exists
+
+- name: Deploy extra docker application templates
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner | default(docker_application_user) }}"
+    group: "{{ item.group | default(docker_application_group) }}"
+    mode: "{{ item.mode | default('0644') }}"
+  loop: "{{ docker_application_template_files }}"
+
+- name: Ensure docker application is running
+  community.docker.docker_compose_v2:
+    project_src: "{{ docker_application_compose_dir }}"
+    state: present
+    pull: "{{ docker_application_pull_policy }}"
+    remove_orphans: "{{ docker_application_remove_orphans }}"
+
+- name: Prune dangling Docker images
+  community.docker.docker_prune:
+    images: true
+    images_filters:
+      dangling: true
+  when: docker_application_prune_dangling_images | bool
+
+- name: Include docker application post-tasks
+  ansible.builtin.include_tasks: "{{ docker_application_post_tasks_file }}"
+  when: docker_application_optional_stats.results[2].stat.exists

@@ -1,0 +1,22 @@
+---
+docker_application_name: ""
+docker_application_user: "{{ docker_application_name }}"
+docker_application_group: "{{ docker_application_user }}"
+
+docker_application_compose_dir: "/opt/{{ docker_application_name }}"
+docker_application_compose_file: "{{ docker_application_compose_dir }}/docker-compose.yml"
+docker_application_dotenv_file: "{{ docker_application_compose_dir }}/.env"
+docker_application_config_dir: "{{ docker_application_compose_dir }}/config"
+docker_application_storage_dirs: []
+
+docker_application_compose_template: "{{ playbook_dir }}/templates/docker-compose.yml.j2"
+docker_application_dotenv_template: "{{ playbook_dir }}/templates/dotenv.j2"
+docker_application_deploy_dotenv: true
+docker_application_template_files: []
+
+docker_application_pre_tasks_file: "{{ playbook_dir }}/tasks/pre.yml"
+docker_application_post_tasks_file: "{{ playbook_dir }}/tasks/post.yml"
+
+docker_application_pull_policy: always
+docker_application_remove_orphans: true
+docker_application_prune_dangling_images: true
