@@ -2,6 +2,8 @@
 - name: Reconcile docker application compose
   community.docker.docker_compose_v2:
     project_src: "{{ docker_application_compose_dir }}"
+    files: "{{ docker_application_compose_files }}"
+    env_files: "{{ docker_application_env_files | default(omit) }}"
     state: present
     pull: "{{ docker_application_pull_policy }}"
     remove_orphans: "{{ docker_application_remove_orphans }}"
@@ -9,6 +11,8 @@
 - name: Restart docker application
   community.docker.docker_compose_v2:
     project_src: "{{ docker_application_compose_dir }}"
+    files: "{{ docker_application_compose_files }}"
+    env_files: "{{ docker_application_env_files | default(omit) }}"
     state: restarted
 
 - name: Prune dangling Docker images

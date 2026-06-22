@@ -6,6 +6,7 @@ docker_application_group: "{{ docker_application_user }}"
 docker_application_compose_dir: "/opt/{{ docker_application_name }}"
 docker_application_compose_file: "{{ docker_application_compose_dir }}/docker-compose.yml"
 docker_application_dotenv_file: "{{ docker_application_compose_dir }}/.env"
+docker_application_dotenv_mode: "0600"
 docker_application_config_dir: "{{ docker_application_compose_dir }}/config"
 docker_application_storage_dirs: []
 
