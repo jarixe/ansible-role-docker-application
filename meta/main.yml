@@ -1,0 +1,22 @@
+---
+galaxy_info:
+  role_name: docker_application
+  author: jarixe
+  description: >-
+    Deploys a Docker Compose application with minimal per-app Ansible code:
+    renders docker-compose.yml (plus an optional .env and extra config
+    templates), reconciles the Compose project, and prunes dangling images.
+  min_ansible_version: "2.11"
+  platforms:
+    - name: Debian
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+  galaxy_tags:
+    - docker
+    - compose
+    - deployment
+
+dependencies: []
