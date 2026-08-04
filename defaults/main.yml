@@ -20,4 +20,4 @@ docker_application_post_tasks_file: "{{ playbook_dir }}/tasks/post.yml"
 
 docker_application_pull_policy: always
 docker_application_remove_orphans: true
-docker_application_prune_dangling_images: true
+docker_application_prune_unused_images: true

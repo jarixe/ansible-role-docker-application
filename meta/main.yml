@@ -5,7 +5,7 @@ galaxy_info:
   description: >-
     Deploys a Docker Compose application with minimal per-app Ansible code:
     renders docker-compose.yml (plus an optional .env and extra config
-    templates), reconciles the Compose project, and prunes dangling images.
+    templates), reconciles the Compose project, and prunes unused images.
   min_ansible_version: "2.11"
   platforms:
     - name: Debian
