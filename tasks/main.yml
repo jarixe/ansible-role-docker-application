@@ -104,12 +104,12 @@
     pull: "{{ docker_application_pull_policy }}"
     remove_orphans: "{{ docker_application_remove_orphans }}"
 
-- name: Prune dangling Docker images
+- name: Prune unused Docker images
   community.docker.docker_prune:
     images: true
     images_filters:
-      dangling: true
-  when: docker_application_prune_dangling_images | bool
+      dangling: false
+  when: docker_application_prune_unused_images | bool
 
 - name: Include docker application post-tasks
   ansible.builtin.include_tasks: "{{ docker_application_post_tasks_file }}"

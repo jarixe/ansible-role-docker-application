@@ -14,10 +14,3 @@
     files: "{{ docker_application_compose_files }}"
     env_files: "{{ docker_application_env_files | default(omit) }}"
     state: restarted
-
-- name: Prune dangling Docker images
-  community.docker.docker_prune:
-    images: true
-    images_filters:
-      dangling: true
-  when: docker_application_prune_dangling_images | bool

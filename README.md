@@ -9,7 +9,7 @@ Deploys a Docker Compose application with minimal per-app Ansible code.
 - Optionally renders `.env` from `templates/dotenv.j2` when that file exists.
 - Optionally renders extra templates for app config files.
 - Pulls newer images and reconciles the Compose project on each run.
-- Prunes dangling Docker images after deployment.
+- Prunes unused Docker images after deployment.
 - Optionally includes playbook-local pre and post task files.
 
 ## Requirements
@@ -40,7 +40,7 @@ Deploys a Docker Compose application with minimal per-app Ansible code.
 | `docker_application_post_tasks_file` | `<playbook_dir>/tasks/post.yml` | Optional playbook-local tasks file included after deployment if it exists. |
 | `docker_application_pull_policy` | `always` | Compose pull policy used during reconciliation. |
 | `docker_application_remove_orphans` | `true` | Removes orphaned services from the Compose project. |
-| `docker_application_prune_dangling_images` | `true` | Prunes dangling images after deployment. |
+| `docker_application_prune_unused_images` | `true` | Prunes all images not used by a container after deployment. |
 
 ## Example Playbook
 
