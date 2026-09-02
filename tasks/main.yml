@@ -103,6 +103,10 @@
     state: present
     pull: "{{ docker_application_pull_policy }}"
     remove_orphans: "{{ docker_application_remove_orphans }}"
+  register: docker_application_compose_result
+  until: docker_application_compose_result is succeeded
+  retries: "{{ docker_application_compose_retries }}"
+  delay: "{{ docker_application_compose_retry_delay }}"
 
 - name: Prune unused Docker images
   community.docker.docker_prune:
