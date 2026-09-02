@@ -41,6 +41,8 @@ Deploys a Docker Compose application with minimal per-app Ansible code.
 | `docker_application_pull_policy` | `always` | Compose pull policy used during reconciliation. |
 | `docker_application_remove_orphans` | `true` | Removes orphaned services from the Compose project. |
 | `docker_application_prune_unused_images` | `true` | Prunes all images not used by a container after deployment. |
+| `docker_application_compose_retries` | `3` | Attempts for the reconciliation step, which is the one that contacts the registry. |
+| `docker_application_compose_retry_delay` | `15` | Seconds between those attempts. |
 
 ## Example Playbook
 
